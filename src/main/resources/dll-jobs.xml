@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:batch="http://www.springframework.org/schema/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch 
+		http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		">
+
+    <import resource="context.xml"/>
+    
+    
+    <bean id="doorTogglerDataGenerator" class="com.accenture.dll.reader.DoorLockDataGeneratorStrategy"/>
+    <bean id="customeItemReader" class="com.accenture.dll.reader.CustomeItemReader">
+    	<property name="dataGeneratorStrategy" ref="doorTogglerDataGenerator"/>
+    </bean>
+    
+     <bean id="doorTogglerDateProcessorStrategy" class="com.accenture.dll.processor.DoorTogglerDataProcessorStrategy"/>
+     <bean id="customeItemProcessor" class="com.accenture.dll.processor.CustomItemProcessor">
+     	<property name="dataProcessorStrategy" ref="doorTogglerDateProcessorStrategy"/>
+     </bean>
+     
+     
+    <bean id="DataWriterStrategy" class="com.accenture.dll.writer.DoorTogglerDataWriterStrategy" /> 
+    <bean id="customeItemWriter" class="com.accenture.dll.writer.CusomeItemWriter">
+    	<property name="dataWriterStrategy" ref="DataWriterStrategy"/>
+    </bean>
+    
+	<job id="doorToggler" xmlns="http://www.springframework.org/schema/batch">
+
+		<step id="step1">
+			<tasklet>
+				<chunk reader="customeItemReader"  processor="customeItemProcessor"  writer="customeItemWriter"  commit-interval="1"/>
+			</tasklet>
+		</step>
+
+	</job>
+
+
+</beans>
